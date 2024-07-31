@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/styles.css">
+  <title>Notification API</title>
+</head>
+<body>
+  <div class="container">
+    <h1>Notification API</h1>
+    <form action="/push" method="POST">
+      <textarea name="message" placeholder="Enter your message" required></textarea>
+      <button type="submit">Push</button>
+    </form>
+    <ul>
+      <% messages.forEach(message => { %>
+        <li>
+          <%= message.text %> ( <%= message.date.toDateString() %> )
+          <form action="/delete/<%= message.id %>" method="POST" style="display: inline;">
+            <button type="submit">Delete</button>
+          </form>
+        </li>
+      <% }) %>
+    </ul>
+  </div>
+  <script>
+    document.querySelectorAll('form[action^="/push"]').forEach(form => {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const message = form.querySelector('textarea').value;
+        if (confirm(`Push this message?\n\n"${message}"`)) {
+          form.submit();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
