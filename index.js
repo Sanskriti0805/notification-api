@@ -1,14 +1,18 @@
-const express = require ('express');
-const bodyparser = require ('body-parser');
-const dotenv = require ('dotenv');
-const { generateApiKey, messages } = require ('./messages');
+const express = require('express');
+const bodyparser = require('body-parser');
+const dotenv = require('dotenv');
+const path = require('path');
+const { generateApiKey, messages } = require('./messages');
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Set the views directory
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
@@ -37,7 +41,4 @@ app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
 
-
 module.exports = app;
-
- 
