@@ -36,6 +36,8 @@ app.post('/delete/:id', (req, res) => {
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
-exports.app = app
+
+
+module.exports = app;
 
  
