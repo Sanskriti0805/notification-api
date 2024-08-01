@@ -3,14 +3,19 @@ const bodyparser = require('body-parser');
 const dotenv = require('dotenv');
 const path = require('path');
 const { generateApiKey, messages } = require('./messages');
+const cros = require('cros')
 
 dotenv.config();
 
 const app = express();
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}))
 const port = process.env.PORT || 3000;
 
 // Set the views directory
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'views'));// app/set('views' , '/views')
 app.set('view engine', 'ejs');
 
 app.use(bodyparser.urlencoded({ extended: true }));
