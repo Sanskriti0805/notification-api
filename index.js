@@ -41,7 +41,13 @@ app.post('/delete/:id', (req, res) => {
   }
   res.redirect('/');
 });
+app.use(express.json())
 
+app.get('/messages' , (req,res) => {
+	res.status(200).json({
+	messages :messages
+})
+})
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
