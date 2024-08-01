@@ -3,7 +3,7 @@ const bodyparser = require('body-parser');
 const dotenv = require('dotenv');
 const path = require('path');
 const { generateApiKey, messages } = require('./messages');
-var cors = require('cors')
+const cors = require('cors')
 
 dotenv.config();
 
