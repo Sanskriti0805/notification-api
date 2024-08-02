@@ -26,7 +26,7 @@ app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 app.get('/', async(req, res) => {
-  const messages = await Message.find();
+  const messages = await Message.find().sort({ _id: -1 }); 
   res.render('index', { messages });
 });
 
@@ -81,9 +81,9 @@ app.post('/delete/:id', async (req, res) => {
 
 app.get('/messages', async (req, res) => {
 
-  const messages = await Message.find()
+  const messages = await Message.find().sort({ _id: -1 }); 
 
-  return res.status(200).json({
+  res.status(200).json({
     messages: messages
   })
 })
