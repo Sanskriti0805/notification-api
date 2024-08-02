@@ -3,64 +3,97 @@ const bodyparser = require('body-parser');
 const dotenv = require('dotenv');
 const path = require('path');
 const { generateApiKey, messages } = require('./messages');
-const mongoose = require('mongoose');
 const cors = require('cors')
-
+const mongoose = require("mongoose")
+const main = require("./config/connetDB.js");
+const Message = require('./models/mesagesModel.js');
 dotenv.config();
 
 const app = express();
+app.use(express.json())
+
 app.use(cors({
   origin: '*',
   credentials: true
 }))
 const port = process.env.PORT || 3000;
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-
-const messageSchema = new mongoose.Schema({
-  text: String,
-  date: { type: Date, default: Date.now }
-});
-
-const Message = mongoose.model('Message', messageSchema);
-
 // Set the views directory
-app.set('views', path.join(__dirname, 'views'));// app/set('views' , '/views')
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-app.get('/', (req, res) => {
+app.get('/', async(req, res) => {
+  const messages = await Message.find();
   res.render('index', { messages });
 });
 
-app.post('/push', (req, res) => {
+app.post('/push', async (req, res) => {
   const { message } = req.body;
-  if (message) {
-    messages.push({ id: generateApiKey(), text: message, date: new Date() });
+  console.log(message)
+
+  if (!message) {
+    return res.status(400).json({ error: 'Message is required' });
   }
-  res.redirect('/');
+
+  const payload = {
+    message: message
+  };
+
+  try {
+    const pushMessage = new Message(payload);
+    const savedMessage = await pushMessage.save();
+
+    console.log(savedMessage);
+
+    // window.location.href = '/';
+
+    // return res.status(201).json({
+    //   message: savedMessage.message, 
+    //   date: savedMessage.date,
+    //   time: savedMessage.time
+    // });
+
+    res.redirect('/')
+  } catch (error) {
+    console.error('Error saving message:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-app.post('/delete/:id', (req, res) => {
-  const { id } = req.params;
-  const messageIndex = messages.findIndex(msg => msg.id === id);
-  if (messageIndex !== -1) {
-    messages.splice(messageIndex, 1);
-  }
-  res.redirect('/');
-});
-app.use(express.json())
 
-app.get('/messages' , (req,res) => {
-	res.status(200).json({
-	messages :messages
-})
-})
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+app.post('/delete/:id', async (req, res) => {
+  const { id } = req.params
+
+  const deleteMessage = await Message.findByIdAndDelete(id)
+
+  // window.location.href = '/';
+  // return res.status(200).json({
+  //   message: 'deleted succesfully',
+  //   data: deleteMessage
+  // })
+
+  res.redirect('/')
+
 });
+
+app.get('/messages', async (req, res) => {
+
+  const messages = await Message.find()
+
+  return res.status(200).json({
+    messages: messages
+  })
+})
+
+main().then(() => {
+  app.listen(port, () => {
+    console.log('server started at ' + port)
+  })
+})
+
+
 
 module.exports = app;
