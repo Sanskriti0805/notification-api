@@ -3,6 +3,7 @@ const bodyparser = require('body-parser');
 const dotenv = require('dotenv');
 const path = require('path');
 const { generateApiKey, messages } = require('./messages');
+const mongoose = require('mongoose');
 const cors = require('cors')
 
 dotenv.config();
@@ -13,6 +14,16 @@ app.use(cors({
   credentials: true
 }))
 const port = process.env.PORT || 3000;
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+
+const messageSchema = new mongoose.Schema({
+  text: String,
+  date: { type: Date, default: Date.now }
+});
+
+const Message = mongoose.model('Message', messageSchema);
 
 // Set the views directory
 app.set('views', path.join(__dirname, 'views'));// app/set('views' , '/views')
